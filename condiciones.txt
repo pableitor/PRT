@@ -1,0 +1,26 @@
+//largos si CCI CRUZA -100 o 0  y MACD ALCISTA
+C1 = CCI[14](CLOSE)  CROSSES OVER 100
+C3 = CLOSE > ExponentialAverage[350](close)
+C5 = CLOSE > Average[40](close) // en graficos de 15 min la mm40 equivale a la mm20 en 30 min
+C7 = MACDline[12,26,9](close) > 0
+BUYCOND = C1 AND C3 AND C5 AND C7
+
+C2 = CCI[14](CLOSE) CROSSES UNDER -100
+C4 = close < ExponentialAverage[350](close)
+C6 = CLOSE < Average[40](close)
+C8 = MACDline[12,26,9](close) < 0
+SELLCOND = C2 AND C4 AND C6 AND C8
+
+//CALCULO VELAS HA DIARIAS
+//xClose = (Open + High + Low + Close)/4
+//if (BarIndex >2) then
+//xOpen = (xOpen[1] + xClose[1])/2
+//endif
+xClose = (Open+High+Low+Close)/4
+if(barindex>2) then
+xOpen = (xOpen[1] + xClose[1])/2
+endif
+
+exitlongcond= XCLOSE < XOPEN AND XCLOSE[1] > XOPEN[1] //CONDICION PARA CERRAR LARGOS : CAMBIO DE VELA HEIKEN ASHI DE VERDEA  ROJO
+exitshortcond= XCLOSE > XOPEN AND XCLOSE[1] < XOPEN[1] //CONDICION PARA CERRAR CORTOS : CAMBIO DE VELA HEIKEN ASHI DE ROJO A VERDE
+return  BUYCOND , SELLCOND, exitlongcond, exitshortcond
