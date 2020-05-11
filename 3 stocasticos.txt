@@ -1,0 +1,78 @@
+//DIBUJA STOCASTICO (10 POR DEFECTO) EN EL TF ACTUAL Y EN LOS 2 SUPERIORES DESDE 1 MINUTO HASTA H4
+STOL = 20
+STOH = 80
+
+EMAPER = 9
+once a=5 //FACTOR MULTIPLICADOR PARA TF SUPERIOR
+once b=4 //FACTOR MULTIPLICADOR PARA 2º TF SUPERIOR
+if (barindex = 1 or barindex = 2) and time-time[1] > 0 then //comprueba diferencia de tiempo entre bars y que no haya cambio de dia
+x = time-time[1]
+if x = 100 then //grafico 1m
+a = 5 //m5
+b = 3 //m15
+elsif x = 500 then //grafico 5m
+a = 3 //m15
+b = 4 //h1
+elsif x = 1500 then //grafico 15m
+a = 4 //h1
+b = 4 //h4
+elsif x = 10000 then //grafico h1
+a = 4 //h4
+b = 5 //d1
+elsif x = 40000 then //grafico h4
+a = 5 //d1
+b = 6 //w1
+endif
+endif
+htfLOWEST=lowest[p](low)
+htfHIGHEST=highest[p](high)
+stoctmp1 = 100*(CLOSE - htfLOWEST) / ( htfHIGHEST - htfLOWEST)
+k1 = Average[3](stoctmp1) // stochastic[STOCPER,3](close)
+d1 = Average[3](k1)
+
+htfLOWEST=lowest[a*p](low)
+htfHIGHEST=highest[a*p](high)
+stoctmp2 = 100*(CLOSE - htfLOWEST) / ( htfHIGHEST - htfLOWEST)
+
+k2 = WeightedAverage[a * 3](stoctmp2) // Stochastic[30,9](close)
+d2 = WeightedAverage[a * 3](k2) // LINEA D STO(8)M15
+
+htfLOWEST=lowest[a*b*p](low)
+htfHIGHEST=highest[a*b*p](high)
+stoctmp3 = 100*(CLOSE - htfLOWEST) / ( htfHIGHEST - htfLOWEST)
+
+k3 = WeightedAverage[a*b*3](stoctmp3)
+d3 = WeightedAverage[a*b*3](k3)
+
+c1 = (k1 < STOL)
+c2 = (d1 < STOL)
+c3 = (k2 < STOL)// LINEA K STO(8)M15
+c4 = (d2 < STOL)
+c5 = (k3 < STOL)
+c6 = (d3 < STOL)
+
+IF c1 AND c2 AND c3 AND c4 AND c5 AND c6  THEN
+LFlag = 1
+ENDIF
+C9 = CLOSE CROSSES UNDER ExponentialAverage[EMAPER](close)
+IF LFlag AND C9 THEN
+LFlag = 0
+
+ENDIF
+c11 = (k1 > STOH)
+c12 = (d1 > STOH)
+c13 = (k2 > STOH)
+c14 = (d2 > STOH)
+c15 = (k3 > STOH)
+c16 = (d3 > STOH)
+
+IF c11 AND c12 AND c13 AND c14 AND c15 AND c16  THEN
+SFlag =1
+ENDIF
+C19 = CLOSE CROSSES OVER ExponentialAverage[EMAPER](close)
+IF SFlag AND C19 THEN
+SFlag = 0
+
+ENDIF
+
+return k1 coloured (0,204,51) style(LINE,1 ) as "K%", d1 coloured (0,204,51) style(DOTTEDLINE,1 ) as "D%",k2 coloured (0,0,255) style(LINE,1 ) as "K%", d2 coloured (0,0,255) style(DOTTEDLINE,1 ) as "D%",k3 coloured (0,0,0) style(LINE,1 ) as "K%", d3 coloured (0,0,0) style(DOTTEDLINE,1 ) as "D%" ,80 coloured (0,192,192) style(LINE,3 ),20 coloured (255,0,0) style(LINE,3 ), lflag*100  coloured (0,192,0) style(line,3) , sflag*100  coloured (192,0,0) style(line,3)
